@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "229250146329",
+    "project_id": "eccr-demo",
+    "storage_bucket": "eccr-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:229250146329:android:a2cc5d45f9264d3c258a88",
+        "android_client_info": {
+          "package_name": "com.example.eccr_demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXqj4T9ek0p8LoKOytfOVOhRnQQPHLqm4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
