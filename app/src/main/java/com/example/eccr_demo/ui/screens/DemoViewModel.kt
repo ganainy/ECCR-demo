@@ -15,78 +15,154 @@
  */
 package com.example.marsphotos.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.util.Log
+import androidx.core.content.ContextCompat
 import ApiInterface
-import PostRequestData
-import ReceivedData
-import PostResponseData
+
 import android.content.res.Resources
 import android.os.Build
-import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.Locale
-
+import android.content.Context
+import android.content.Context.LOCATION_SERVICE
+import androidx.compose.runtime.MutableState
+import com.example.eccr_demo.data.DeviceIdentifiers
+import com.example.eccr_demo.data.PostResponseData
+import com.example.eccr_demo.data.ReceivedData
+import java.net.NetworkInterface
+import java.util.*
 
 /**
  * UI state for the Home screen
  */
-sealed interface DemoUiState {
-   // data class Success(val photos: List<MarsPhoto>) : MarsUiState
-    object Error : DemoUiState
-    object Loading : DemoUiState
-}
 
 class DemoViewModel : ViewModel() {
-    private val TAG= "ECCRViewModel"
+    private val TAG = "ECCRViewModel"
     private lateinit var apiInterface: ApiInterface
-    /** The mutable State that stores the status of the most recent request */
-    var demoUiState: DemoUiState by mutableStateOf(DemoUiState.Loading)
-        private set
 
+    /** The mutable State that stores the status of the most recent request */
+
+
+    var demoUiState: MutableState<DemoUiState> = mutableStateOf(DemoUiState())
+        private set
 
     init {
         getApiInterface()
 
-        collectDeviceInfo()
+        Log.d(TAG, "getIPAddress(): ${getIPAddress(true)}")
+        Log.d(TAG, "getMACAddress(): ${getMACAddress()}")
 
         /*getData()
         postData()*/
     }
 
-    private fun collectDeviceInfo() {
-        val deviceModel = Build.MODEL
-        val osVersion = Build.VERSION.RELEASE
-        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
-        val locale = Locale.getDefault()
 
-        Log.d("AppInfo", "Device Model: $deviceModel")
-        Log.d("AppInfo", "Operating System: $osVersion")
-        Log.d("AppInfo", "Screen Resolution: $screenWidth x $screenHeight")
-        Log.d("AppInfo", "Locale: $locale")
+    fun getIPAddress(useIPv4: Boolean = true): String {
+        try {
+            val interfaces: List<NetworkInterface> =
+                Collections.list(NetworkInterface.getNetworkInterfaces())
+            for (intf in interfaces) {
+                val addrs = intf.inetAddresses
+                for (addr in Collections.list(addrs)) {
+                    if (!addr.isLoopbackAddress) {
+                        val sAddr = addr.hostAddress
+                        val isIPv4 = sAddr.indexOf(':') < 0
+                        if (useIPv4) {
+                            if (isIPv4) return sAddr
+                        } else {
+                            if (!isIPv4) {
+                                val delim = sAddr.indexOf('%')
+                                return if (delim < 0) sAddr.uppercase(Locale.getDefault()) else sAddr.substring(
+                                    0,
+                                    delim
+                                ).uppercase(Locale.getDefault())
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        return ""
     }
-    //ip address, location, mac adress, android version
-    //burpsuite fiddler everywhere
 
 
+    private fun getMACAddress(): String {
+        try {
+            val all = Collections.list(NetworkInterface.getNetworkInterfaces())
+            for (nif in all) {
+                if (!nif.name.equals("wlan0", ignoreCase = true)) continue
+
+                val macBytes = nif.hardwareAddress ?: return ""
+                val res1 = StringBuilder()
+                for (b in macBytes) {
+                    res1.append(String.format("%02X:", b))
+                }
+
+                if (res1.isNotEmpty()) {
+                    res1.deleteCharAt(res1.length - 1)
+                }
+                return res1.toString()
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        return "02:00:00:00:00:00"
+    }
+
+    fun getLocation(context: Context) {
+        val locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val networkLocation =
+                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+
+            Log.d(TAG, "GPS Location: $gpsLocation")
+            Log.d(TAG, "Network Location: $networkLocation")
+        }
+    }
 
 
-    //monkey ui automator
-    //jadx apktool
-    private fun postData() {
-        val call = apiInterface.postData(PostRequestData("1.1.1.1","DFSDGSGSDGSH"))
+    fun postDeviceIdentifiers(context: Context) {
+
+        val deviceIdentifiers = DeviceIdentifiers(
+            imei = "123456789012345",
+            imsi = "987654321098765",
+            simNumber = "1234567890123456789",
+            serialNumber = "ABC123DEF456",
+            androidId = "abcdef1234567890",
+            phoneNumber = "1234567890",
+            deviceModel = Build.MODEL,
+            osVersion = Build.VERSION.RELEASE,
+            screenWidth = Resources.getSystem().displayMetrics.widthPixels.toString(),
+            screenHeight = Resources.getSystem().displayMetrics.heightPixels.toString(),
+            locale = Locale.getDefault().toString(),
+        )
+
+
+        val call = apiInterface.postDeviceIdentifiers(deviceIdentifiers)
 
         call.enqueue(object : Callback<PostResponseData> {
-            override fun onResponse(call: Call<PostResponseData>, response: Response<PostResponseData>) {
+            override fun onResponse(
+                call: Call<PostResponseData>,
+                response: Response<PostResponseData>
+            ) {
                 if (response.isSuccessful) {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
-                        Log.d(TAG, "postData(): Data: ${returnedResponse.received}")
+                        Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
                         Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
 
                         // Handle the response here
@@ -107,11 +183,11 @@ class DemoViewModel : ViewModel() {
         apiInterface = RetrofitInstance.getInstance().create(ApiInterface::class.java)
     }
 
-    private fun getData(){
+    private fun getData() {
         val call = apiInterface.receiveData()
         call.enqueue(object : Callback<ReceivedData> {
             override fun onResponse(call: Call<ReceivedData>, response: Response<ReceivedData>) {
-                if (response.isSuccessful && response.body()!=null){
+                if (response.isSuccessful && response.body() != null) {
                     Log.d(TAG, " getData(): onResponse: ${response.body()}")
                 }
             }
@@ -123,5 +199,13 @@ class DemoViewModel : ViewModel() {
         })
     }
 
+    fun onPrivacyInteraction() {
+        demoUiState.value = demoUiState.value.copy(
+            isPrivacyPolicyDismissed = true
+        )
+    }
+
 
 }
+
+data class DemoUiState(var isPrivacyPolicyDismissed: Boolean = false)

@@ -19,6 +19,7 @@
 package com.example.marsphotos.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -40,27 +41,28 @@ import com.example.marsphotos.ui.screens.DemoViewModel
 fun DemoApp() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = { DemoTopAppBar(scrollBehavior = scrollBehavior) }
+        modifier = Modifier
+            .fillMaxSize(),
+        topBar = { DemoTopAppBar() }
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(top = it.calculateTopPadding())
         ) {
             val demoViewModel: DemoViewModel =
                 viewModel()
             HomeScreen(
-                demoUiState = demoViewModel.demoUiState,
+                demoUiState = demoViewModel.demoUiState.value,
                 retryAction = {},
-                contentPadding = it
+                contentPadding = it,
+                viewModel=demoViewModel
             )
         }
     }
 }
 
 @Composable
-fun DemoTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier = Modifier) {
+fun DemoTopAppBar( modifier: Modifier = Modifier) {
     CenterAlignedTopAppBar(
-        scrollBehavior = scrollBehavior,
         title = {
             Text(
                 text = stringResource(R.string.app_name),
