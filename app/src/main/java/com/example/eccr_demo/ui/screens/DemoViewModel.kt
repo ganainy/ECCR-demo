@@ -34,8 +34,13 @@ import android.content.Context
 import android.content.Context.LOCATION_SERVICE
 import androidx.compose.runtime.MutableState
 import com.example.eccr_demo.data.DeviceIdentifiers
+import com.example.eccr_demo.data.FakeNews
+import com.example.eccr_demo.data.Location
+import com.example.eccr_demo.data.Locator
 import com.example.eccr_demo.data.PostResponseData
 import com.example.eccr_demo.data.ReceivedData
+import com.example.eccr_demo.data.ScreenType
+import com.example.eccr_demo.data.fakeNewsList
 import java.net.NetworkInterface
 import java.util.*
 
@@ -163,7 +168,7 @@ class DemoViewModel : ViewModel() {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
                         Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
-                        updateUiState(ad_link=returnedResponse.ad_link)
+                        updateHomeAdLink(ad_link=returnedResponse.ad_link)
                         Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
 
                         // Handle the response here
@@ -179,9 +184,16 @@ class DemoViewModel : ViewModel() {
         })
     }
 
-    private fun updateUiState(ad_link: String?) {
+    private fun updateHomeAdLink(ad_link: String?) {
         demoUiState.value = demoUiState.value.copy(
-            adLink = ad_link
+            homeAdLink = ad_link
+        )
+    }
+
+    private fun updateDetailsAdLink(ad_link: String?) {
+        Log.d(TAG, "updateDetailsAdLink(): ad_link: $ad_link")
+        demoUiState.value = demoUiState.value.copy(
+            detailsAdLink = ad_link
         )
     }
 
@@ -213,6 +225,99 @@ class DemoViewModel : ViewModel() {
     }
 
 
+    fun navigateToDetails(news: FakeNews) {
+        demoUiState.value = demoUiState.value.copy(
+            currentNews = news,
+            homeAdLink = null,
+            screenType = ScreenType.Details
+        )
+    }
+
+    fun backToHome() {
+        demoUiState.value = demoUiState.value.copy(
+            screenType = ScreenType.HomeScreen
+        )
 }
 
-data class DemoUiState(var isPrivacyPolicyDismissed: Boolean = false,var adLink: String? = null)
+    fun postLocation(lat: Double, lng: Double) {
+
+        val call = apiInterface.postLocation(Location(lat.toString(),lng.toString()))
+
+        call.enqueue(object : Callback<PostResponseData> {
+            override fun onResponse(
+                call: Call<PostResponseData>,
+                response: Response<PostResponseData>
+            ) {
+                if (response.isSuccessful) {
+                    val returnedResponse = response.body()
+                    if (returnedResponse != null) {
+                        Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
+                        updateDetailsAdLink(ad_link=returnedResponse.ad_link)
+                        Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
+
+                        // Handle the response here
+                    }
+                } else {
+                    Log.e(TAG, "postData(): Request failed with status: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<PostResponseData>, t: Throwable) {
+                Log.e(TAG, "postData(): Request failed: ${t.message}")
+            }
+        })
+    }
+
+    fun postMacAndIp() {
+
+        val mac = getMACAddress()
+        val ip = getIPAddress(true)
+
+        val call = apiInterface.postLocator(Locator(mac,ip))
+
+        call.enqueue(object : Callback<PostResponseData> {
+            override fun onResponse(
+                call: Call<PostResponseData>,
+                response: Response<PostResponseData>
+            ) {
+                if (response.isSuccessful) {
+                    val returnedResponse = response.body()
+                    if (returnedResponse != null) {
+                        Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
+                        updateDetailsAdLink(ad_link=returnedResponse.ad_link)
+                        Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
+
+                        // Handle the response here
+                    }
+                } else {
+                    Log.e(TAG, "postData(): Request failed with status: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<PostResponseData>, t: Throwable) {
+                Log.e(TAG, "postData(): Request failed: ${t.message}")
+            }
+        })
+    }
+
+    fun showSettingsScreen() {
+        demoUiState.value = demoUiState.value.copy(
+            screenType = ScreenType.Settings
+        )
+    }
+
+    fun enableLocation(isLocationEnabled: Boolean) {
+        demoUiState.value = demoUiState.value.copy(
+            enableLocation = isLocationEnabled
+        )
+
+    }
+
+}
+data class DemoUiState(
+    var isPrivacyPolicyDismissed: Boolean = false,
+    var homeAdLink: String? = null,
+    var detailsAdLink: String? = null,
+    var screenType: ScreenType = ScreenType.HomeScreen,
+    var currentNews: FakeNews = fakeNewsList[0],
+    val enableLocation: Boolean=false,)

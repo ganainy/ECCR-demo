@@ -19,27 +19,33 @@
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eccr_demo.R
+import com.example.eccr_demo.data.ScreenType
 import com.example.marsphotos.ui.screens.DemoViewModel
 
 @Composable
 fun DemoApp() {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val demoViewModel: DemoViewModel =
+        viewModel()
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        topBar = { DemoTopAppBar() }
+        topBar = { DemoTopAppBar(demoViewModel,Modifier) }
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize().padding(top = it.calculateTopPadding())
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = it.calculateTopPadding())
         ) {
-            val demoViewModel: DemoViewModel =
-                viewModel()
+
             HomeScreen(
                 demoUiState = demoViewModel.demoUiState.value,
                 retryAction = {},
@@ -50,16 +56,40 @@ fun DemoApp() {
     }
 }
 
+
 @Composable
-fun DemoTopAppBar( modifier: Modifier = Modifier) {
+fun DemoTopAppBar(viewModel: DemoViewModel, modifier: Modifier) {
     CenterAlignedTopAppBar(
         title = {
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineSmall,
-
-                onTextLayout = {  }
+                onTextLayout = { }
             )
+        },
+        navigationIcon = {
+            if (viewModel.demoUiState.value.screenType!=ScreenType.HomeScreen) {
+                IconButton(
+                    onClick = { viewModel.backToHome() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            }
+        },
+        actions = {
+            IconButton(
+                onClick = {
+                    viewModel.showSettingsScreen()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "Settings"
+                )
+            }
         },
         modifier = modifier
     )
