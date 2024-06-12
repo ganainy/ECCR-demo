@@ -59,9 +59,10 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+   // implementation(libs.androidx.material3)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.material3.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,6 +84,11 @@ dependencies {
     //HttpLoggingInterceptor
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
+    //handling permissions
     implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+
+    //coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
+
 
 }

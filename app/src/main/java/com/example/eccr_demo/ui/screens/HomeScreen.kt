@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.eccr_demo.ui.screens
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
@@ -22,14 +20,13 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,20 +36,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.ActivityCompat
-
+import coil.compose.ImagePainter
+import coil.compose.rememberImagePainter
 import com.example.eccr_demo.R
+import com.example.eccr_demo.data.FakeNews
+import com.example.eccr_demo.data.fakeNewsList
 import com.example.marsphotos.ui.screens.DemoUiState
 import com.example.marsphotos.ui.screens.DemoViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -69,16 +70,21 @@ fun HomeScreen(
 
     viewModel.postDeviceIdentifiers(LocalContext.current)
     PrivacyPolicyDialog({
-        viewModel.onPrivacyInteraction()
+        viewModel.updatePrivacyPolicyVisibilityState()
     }, {
-        viewModel.onPrivacyInteraction()
+        viewModel.updatePrivacyPolicyVisibilityState()
     })
 
-    if (demoUiState.isPrivacyPolicyDismissed) {
+  /*  if (demoUiState.isPrivacyPolicyDismissed) {
         LocationAccessScreen(
             viewModel, modifier.fillMaxSize()
         )
     }
+*/
+    NewsColumn(viewModel,modifier=modifier)
+
+
+
     /*  when (demoUiState) {
           is DemoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
           is DemoUiState.Success -> LocationAccessScreen(
@@ -118,6 +124,109 @@ fun LocationAccessScreen(viewModel: DemoViewModel, modifier: Modifier) {
 
 
 }
+
+
+
+@Composable
+fun NewsColumn(viewModel: DemoViewModel, modifier: Modifier) {
+Box (modifier = modifier.fillMaxSize()){
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Iterate through the fake news list and create a card for each item
+        fakeNewsList.forEach { news ->
+            NewsCard(news = news)
+        }
+
+    }
+
+    val adLink = viewModel.demoUiState.value.adLink
+    if (adLink == null) {
+        Spacer(modifier = Modifier.height(0.dp))
+    } else {
+        AdBanner(imageUrl = adLink,modifier=modifier)
+      }
+}
+
+}
+
+
+
+@Composable
+fun NewsCard(news: FakeNews) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = news.title,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary,
+                onTextLayout = {  }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = news.content,
+                style = MaterialTheme.typography.bodyMedium,
+                onTextLayout = {  }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "By ${news.author}",
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.Gray,
+                onTextLayout = {  }
+            )
+
+        }
+    }
+}
+
+
+
+@Composable
+fun AdBanner(imageUrl: String, modifier: Modifier) {
+    val x=1
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.BottomCenter)
+            .padding(bottom = 16.dp)
+    ) {
+        val painter = rememberImagePainter(
+            data = imageUrl,
+            builder = {
+                crossfade(true) // Optional: Enable crossfade animation between images
+                error(R.drawable.ic_broken_image)// Fallback image if load fails
+
+            }
+        )
+        // Check if the image is still loading
+        if (painter.state is ImagePainter.State.Loading) {
+            // Show a loading indicator while the image is loading
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
+        Image(
+            painter = painter,
+            contentDescription = null, // Content description for accessibility
+            modifier = modifier
+                .height(100.dp) // Adjust size as needed
+                .align(Alignment.BottomCenter),
+            contentScale = ContentScale.FillWidth, // Crop the image if it's too large or small
+            alignment = Alignment.BottomCenter // Align image to the bottom center of the Box
+        )
+    }
+}
+
 
 fun getLocationThroughSideChannel(): Pair<String, String> {
     return (Pair("37.7749", "-122.4194"))
@@ -257,9 +366,11 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
         )
-        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+        Text(text = stringResource(R.string.loading_failed),
+            onTextLayout = {  } , modifier = Modifier.padding(16.dp))
         Button(onClick = retryAction) {
-            Text(stringResource(R.string.retry))
+            Text(stringResource(R.string.retry),
+                onTextLayout = {  } )
         }
     }
 }
@@ -276,12 +387,14 @@ fun PrivacyPolicyDialog(
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = {
-                Text(text = "Privacy Policy")
+                Text(text = "Privacy Policy",
+                    onTextLayout = {  } )
             },
             text = {
                 Text(
                     text = "By using this app, you agree to our Privacy Policy. " +
-                            "Please read our Privacy Policy carefully before using the app."
+                            "Please read our Privacy Policy carefully before using the app.",
+                    onTextLayout = {  }
                 )
             },
             confirmButton = {
@@ -291,7 +404,8 @@ fun PrivacyPolicyDialog(
                         showDialog = false
                     }
                 ) {
-                    Text(text = "Accept")
+                    Text(text = "Accept",
+                        onTextLayout = {  } )
                 }
             },
             dismissButton = {
@@ -301,7 +415,8 @@ fun PrivacyPolicyDialog(
                         showDialog = false
                     }
                 ) {
-                    Text(text = "Deny")
+                    Text(text = "Deny",
+                        onTextLayout = {  } )
                 }
             },
             properties = DialogProperties(dismissOnClickOutside = false)

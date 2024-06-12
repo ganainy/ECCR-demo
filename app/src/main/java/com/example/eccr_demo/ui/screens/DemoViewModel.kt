@@ -163,6 +163,7 @@ class DemoViewModel : ViewModel() {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
                         Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
+                        updateUiState(ad_link=returnedResponse.ad_link)
                         Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
 
                         // Handle the response here
@@ -176,6 +177,12 @@ class DemoViewModel : ViewModel() {
                 Log.e(TAG, "postData(): Request failed: ${t.message}")
             }
         })
+    }
+
+    private fun updateUiState(ad_link: String?) {
+        demoUiState.value = demoUiState.value.copy(
+            adLink = ad_link
+        )
     }
 
 
@@ -199,7 +206,7 @@ class DemoViewModel : ViewModel() {
         })
     }
 
-    fun onPrivacyInteraction() {
+    fun updatePrivacyPolicyVisibilityState() {
         demoUiState.value = demoUiState.value.copy(
             isPrivacyPolicyDismissed = true
         )
@@ -208,4 +215,4 @@ class DemoViewModel : ViewModel() {
 
 }
 
-data class DemoUiState(var isPrivacyPolicyDismissed: Boolean = false)
+data class DemoUiState(var isPrivacyPolicyDismissed: Boolean = false,var adLink: String? = null)
