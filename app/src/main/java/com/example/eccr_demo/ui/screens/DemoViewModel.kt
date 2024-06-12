@@ -19,6 +19,8 @@ import ApiInterface
 import PostRequestData
 import ReceivedData
 import PostResponseData
+import android.content.res.Resources
+import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +29,7 @@ import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Locale
 
 
 /**
@@ -48,12 +51,35 @@ class DemoViewModel : ViewModel() {
 
     init {
         getApiInterface()
-        getData()
-        postData()
+
+        collectDeviceInfo()
+
+        /*getData()
+        postData()*/
     }
 
+    private fun collectDeviceInfo() {
+        val deviceModel = Build.MODEL
+        val osVersion = Build.VERSION.RELEASE
+        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+        val locale = Locale.getDefault()
+
+        Log.d("AppInfo", "Device Model: $deviceModel")
+        Log.d("AppInfo", "Operating System: $osVersion")
+        Log.d("AppInfo", "Screen Resolution: $screenWidth x $screenHeight")
+        Log.d("AppInfo", "Locale: $locale")
+    }
+    //ip address, location, mac adress, android version
+    //burpsuite fiddler everywhere
+
+
+
+
+    //monkey ui automator
+    //jadx apktool
     private fun postData() {
-        val call = apiInterface.postData(PostRequestData("dataToBePosted"))
+        val call = apiInterface.postData(PostRequestData("1.1.1.1","DFSDGSGSDGSH"))
 
         call.enqueue(object : Callback<PostResponseData> {
             override fun onResponse(call: Call<PostResponseData>, response: Response<PostResponseData>) {
@@ -62,6 +88,7 @@ class DemoViewModel : ViewModel() {
                     if (returnedResponse != null) {
                         Log.d(TAG, "postData(): Data: ${returnedResponse.received}")
                         Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
+
                         // Handle the response here
                     }
                 } else {

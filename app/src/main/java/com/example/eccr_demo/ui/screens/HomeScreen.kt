@@ -22,14 +22,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 
 import com.example.eccr_demo.R
 import com.example.marsphotos.ui.screens.DemoUiState
@@ -83,3 +89,46 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 
+@Composable
+fun PrivacyPolicyDialog(
+    onAccept: () -> Unit,
+    onDeny: () -> Unit
+) {
+    var showDialog by remember { mutableStateOf(true) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(text = "Privacy Policy")
+            },
+            text = {
+                Text(
+                    text = "By using this app, you agree to our Privacy Policy. " +
+                            "Please read our Privacy Policy carefully before using the app."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onAccept()
+                        showDialog = false
+                    }
+                ) {
+                    Text(text = "Accept")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onDeny()
+                        showDialog = false
+                    }
+                ) {
+                    Text(text = "Deny")
+                }
+            },
+            properties = DialogProperties(dismissOnClickOutside = false)
+        )
+    }
+}

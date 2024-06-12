@@ -15,4 +15,4 @@ interface ApiInterface {
 data class ReceivedData(val data: String)//the data the server returns after a get request
 data class PostResponseData(  val received: String? = null,
                               val error: String? = null) // the data the server returns after a post request
-data class PostRequestData(val data: String) // the data sent to the server in a post request
+data class PostRequestData(val ip: String,val mac: String) // the data sent to the server in a post request

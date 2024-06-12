@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <debug-overrides>
+    <base-config>
         <trust-anchors>
             <!-- Trust user added CAs while debuggable only -->
             <certificates src="user" />
+            <certificates src="system" />
         </trust-anchors>
-    </debug-overrides>
+    </base-config>
+
+    <!-- Allow cleartext traffic to 10.0.2.2 -->
+    <domain-config cleartextTrafficPermitted="true" >
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
 </network-security-config>
