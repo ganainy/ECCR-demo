@@ -15,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import com.example.eccr_demo.data.FakeNews
 import com.example.marsphotos.ui.screens.DemoViewModel
 
@@ -25,7 +27,12 @@ fun NewsDetailScreen(news: FakeNews,viewModel: DemoViewModel) {
 
     val demoUiState = viewModel.demoUiState.value
     val lorem="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse convallis nisl ante, congue bibendum justo semper vitae. Duis non fermentum nisl. Etiam mattis, ipsum vel sagittis blandit, erat eros fringilla quam, at malesuada turpis erat id felis. Maecenas scelerisque leo eu sodales ornare. Duis at dictum quam. Nullam posuere mi in dolor commodo auctor. Proin non condimentum urna, vitae iaculis urna. Nullam efficitur sapien quis libero tincidunt, at fringilla tortor volutpat. Nulla maximus commodo mattis. Nam non blandit libero, at auctor sem. Phasellus pellentesque, massa ac pulvinar volutpat, erat nisi tempor purus, at scelerisque libero enim at mauris. Morbi eu est justo. Sed fermentum odio et ultricies blandit. Donec egestas vitae nisl vel posuere. Maecenas porttitor porttitor massa, quis facilisis erat iaculis nec. Ut venenatis ultrices massa."
+
+    viewModel.postSuitableAdRequest()
+
+
     Box(modifier = Modifier.fillMaxSize())
+
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -55,7 +62,7 @@ fun NewsDetailScreen(news: FakeNews,viewModel: DemoViewModel) {
 
 
 
-    val adLink = viewModel.demoUiState.value.detailsAdLink
+    val adLink = demoUiState.detailsAdLink
     if (adLink == null) {
         Spacer(modifier = Modifier.height(0.dp))
     } else {

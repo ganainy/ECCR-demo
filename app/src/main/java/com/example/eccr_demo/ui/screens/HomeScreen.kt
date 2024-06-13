@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -62,13 +61,15 @@ fun HomeScreen(
 
     if (demoUiState.screenType==ScreenType.HomeScreen){
 
-    viewModel.postDeviceIdentifiers(LocalContext.current)
+
 
         if(!demoUiState.isPrivacyPolicyDismissed){
     PrivacyPolicyDialog({
         viewModel.updatePrivacyPolicyVisibilityState()
+        viewModel.postAdvertisingIdentifiers()
     }, {
         viewModel.updatePrivacyPolicyVisibilityState()
+        viewModel.postHomeRandomAdRequest()
     })
         }
 
@@ -80,16 +81,6 @@ fun HomeScreen(
         SettingsScreen(viewModel)
     }
 
-
-    /*  when (demoUiState) {
-          is DemoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-          is DemoUiState.Success -> LocationAccessScreen(
-              viewModel,modifier.fillMaxSize()
-          )
-
-          is DemoUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
-      }
-  */
 
 }
 
@@ -244,7 +235,7 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
 
 @Composable
 fun PrivacyPolicyDialog(
-    onAccept: () -> Unit,
+    onAccept:  () -> Unit,
     onDeny: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(true) }
@@ -259,7 +250,8 @@ fun PrivacyPolicyDialog(
             text = {
                 Text(
                     text = "By using this app, you agree to our Privacy Policy. " +
-                            "Please read our Privacy Policy carefully before using the app.",
+                            "Please read our Privacy Policy carefully before using the app."+
+                    "This app collects some device identifiers and usage data for targeted advertising purposes.",
                     onTextLayout = {  }
                 )
             },

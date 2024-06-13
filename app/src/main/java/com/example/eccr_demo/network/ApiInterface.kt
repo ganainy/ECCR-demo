@@ -1,6 +1,5 @@
-import com.example.eccr_demo.data.DeviceIdentifiers
+import com.example.eccr_demo.data.AdvertisingIdentifiers
 import com.example.eccr_demo.data.Location
-import com.example.eccr_demo.data.Locator
 import com.example.eccr_demo.data.PostResponseData
 import com.example.eccr_demo.data.ReceivedData
 import retrofit2.Call
@@ -13,15 +12,13 @@ interface ApiInterface {
     fun receiveData(): Call<ReceivedData>
 
     @POST("deviceIdentifiers")
-    fun postDeviceIdentifiers(@Body deviceIdentifiers:  DeviceIdentifiers): Call<PostResponseData>
+    fun postAdvertisingIdentifiers(@Body deviceIdentifiers:  AdvertisingIdentifiers): Call<PostResponseData>
 
-
+    @POST("randomAd")
+    fun postRandomAdRequest(@Body randomAdRequest: String): Call<PostResponseData>
     @POST("localAd")
     fun postLocation(@Body location: Location): Call<PostResponseData>
 
-
-    @POST("localAdSideChannel")
-    fun postLocator(@Body locator: Locator): Call<PostResponseData>
 
 }
 
