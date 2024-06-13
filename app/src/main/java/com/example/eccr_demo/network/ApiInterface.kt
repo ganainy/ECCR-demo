@@ -16,11 +16,11 @@ interface ApiInterface {
     fun postDeviceIdentifiers(@Body deviceIdentifiers:  DeviceIdentifiers): Call<PostResponseData>
 
 
-    @POST("germanAd")
+    @POST("localAd")
     fun postLocation(@Body location: Location): Call<PostResponseData>
 
 
-    @POST("germanAd")
+    @POST("localAdSideChannel")
     fun postLocator(@Body locator: Locator): Call<PostResponseData>
 
 }

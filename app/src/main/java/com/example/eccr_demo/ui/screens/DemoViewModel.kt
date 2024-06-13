@@ -251,14 +251,14 @@ class DemoViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
-                        Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
+                        Log.d(TAG, "postLocation(): Data: ${returnedResponse.ad_link}")
                         updateDetailsAdLink(ad_link=returnedResponse.ad_link)
-                        Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
+                        Log.d(TAG, "postLocation(): Error: ${returnedResponse.error}")
 
                         // Handle the response here
                     }
                 } else {
-                    Log.e(TAG, "postData(): Request failed with status: ${response.code()}")
+                    Log.e(TAG, "postLocation(): Request failed with status: ${response.code()}")
                 }
             }
 
@@ -283,19 +283,19 @@ class DemoViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
-                        Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
+                        Log.d(TAG, "postMacAndIp(): Data: ${returnedResponse.ad_link}")
                         updateDetailsAdLink(ad_link=returnedResponse.ad_link)
-                        Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
+                        Log.d(TAG, "postMacAndIp(): Error: ${returnedResponse.error}")
 
                         // Handle the response here
                     }
                 } else {
-                    Log.e(TAG, "postData(): Request failed with status: ${response.code()}")
+                    Log.e(TAG, "postMacAndIp(): Request failed with status: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<PostResponseData>, t: Throwable) {
-                Log.e(TAG, "postData(): Request failed: ${t.message}")
+                Log.e(TAG, "postMacAndIp(): Request failed: ${t.message}")
             }
         })
     }
