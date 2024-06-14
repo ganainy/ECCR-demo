@@ -179,7 +179,6 @@ class DemoViewModel : ViewModel() {
     fun navigateToDetails(news: FakeNews) {
         demoUiState.value = demoUiState.value.copy(
             currentNews = news,
-            homeAdLink = null,
             screenType = ScreenType.Details
         )
     }
