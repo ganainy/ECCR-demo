@@ -12,4 +12,11 @@
     <domain-config cleartextTrafficPermitted="true" >
         <domain includeSubdomains="false">10.0.2.2</domain>
     </domain-config>
+    <!-- Static certificate pinning -->
+  <!--  <domain-config>
+        <domain includeSubdomains="true">eccr-api-92c867671f64.herokuapp.com</domain>
+        <pin-set expiration="2025-03-30">
+            <pin digest="SHA-256">Ox+tDqf1th22BEHg9u/hgK9L+CnIU5wW1q8AVRQ4I1I=</pin>
+        </pin-set>
+    </domain-config>-->
 </network-security-config>
