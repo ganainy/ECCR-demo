@@ -56,11 +56,7 @@ fun NewsDetailScreen(news: FakeNews,viewModel: DemoViewModel) {
 
 
     val adLink = viewModel.demoUiState.value.detailsAdLink
-    if (adLink == null) {
-        Spacer(modifier = Modifier.height(0.dp))
-    } else {
         AdBanner(imageUrl = adLink,modifier=Modifier)
-    }
 
 
 }

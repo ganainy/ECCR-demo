@@ -16,6 +16,7 @@
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -102,11 +103,8 @@ Box (modifier = modifier.fillMaxSize()){
     }
 
     val adLink = viewModel.demoUiState.value.homeAdLink
-    if (adLink == null) {
-        Spacer(modifier = Modifier.height(0.dp))
-    } else {
+
         AdBanner(imageUrl = adLink,modifier=modifier)
-      }
 }
 
 }
@@ -157,13 +155,27 @@ fun NewsCard(news: FakeNews,viewModel: DemoViewModel) {
 
 
 @Composable
-fun AdBanner(imageUrl: String, modifier: Modifier) {
-    val x=1
+fun AdBanner(imageUrl: String?, modifier: Modifier) {
+    if (imageUrl==null){
+        //error loading ad
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.BottomCenter)
+                .systemBarsPadding()
+                .background(color = Color.Gray)
+        ) {
+           Text(text = "Error loading ad (No internet connection)",  modifier = Modifier.align(Alignment.BottomCenter))
+        }
+
+    } else{
+        //ad loaded successfully
     Box(
         modifier = modifier
             .fillMaxSize()
             .wrapContentSize(Alignment.BottomCenter)
             .systemBarsPadding()
+
     ) {
         val painter = rememberImagePainter(
             data = imageUrl,
@@ -190,6 +202,7 @@ fun AdBanner(imageUrl: String, modifier: Modifier) {
             contentScale = ContentScale.FillWidth, // Crop the image if it's too large or small
             alignment = Alignment.BottomCenter // Align image to the bottom center of the Box
         )
+    }
     }
 }
 
