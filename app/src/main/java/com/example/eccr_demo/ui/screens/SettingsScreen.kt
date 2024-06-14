@@ -13,14 +13,13 @@ fun SettingsScreen(
     viewModel: DemoViewModel,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
     ) {
         Text(
             text = "Enable location to show news from your country",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f)
         )
         Switch(

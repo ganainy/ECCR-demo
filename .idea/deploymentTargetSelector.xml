@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-06-12T22:29:06.337698200Z">
+        <DropdownSelection timestamp="2024-06-14T14:07:30.572626500Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\afoda\.android\avd\no-proxy-API_34.avd" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.56.103:5555;connection=a96a7e58" />
             </handle>
           </Target>
         </DropdownSelection>

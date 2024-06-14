@@ -62,7 +62,6 @@ fun HomeScreen(
 
     if (demoUiState.screenType==ScreenType.HomeScreen){
 
-    viewModel.postDeviceIdentifiers(LocalContext.current)
 
         if(!demoUiState.isPrivacyPolicyDismissed){
     PrivacyPolicyDialog({
@@ -81,21 +80,9 @@ fun HomeScreen(
     }
 
 
-    /*  when (demoUiState) {
-          is DemoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-          is DemoUiState.Success -> LocationAccessScreen(
-              viewModel,modifier.fillMaxSize()
-          )
-
-          is DemoUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
-      }
-  */
-
 }
 
 val TAG = "HomeScreen"
-
-
 
 
 @Composable

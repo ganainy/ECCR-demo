@@ -15,34 +15,28 @@
  */
 package com.example.marsphotos.ui.screens
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.location.LocationManager
-import android.util.Log
-import androidx.core.content.ContextCompat
 import ApiInterface
 
 import android.content.res.Resources
 import android.os.Build
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.Locale
-import android.content.Context
-import android.content.Context.LOCATION_SERVICE
 import androidx.compose.runtime.MutableState
 import com.example.eccr_demo.data.DeviceIdentifiers
 import com.example.eccr_demo.data.FakeNews
 import com.example.eccr_demo.data.Location
 import com.example.eccr_demo.data.Locator
 import com.example.eccr_demo.data.PostResponseData
-import com.example.eccr_demo.data.ReceivedData
 import com.example.eccr_demo.data.ScreenType
 import com.example.eccr_demo.data.fakeNewsList
 import java.net.NetworkInterface
 import java.util.*
+import java.security.MessageDigest
 
 /**
  * UI state for the Home screen
@@ -60,17 +54,13 @@ class DemoViewModel : ViewModel() {
 
     init {
         getApiInterface()
-
-        Log.d(TAG, "getIPAddress(): ${getIPAddress(true)}")
-        Log.d(TAG, "getMACAddress(): ${getMACAddress()}")
-
-        /*getData()
-        postData()*/
+        postDeviceIdentifiers()
     }
 
 
-    fun getIPAddress(useIPv4: Boolean = true): String {
-        try {
+    private fun getIPAddress(useIPv4: Boolean = true): String {
+        return "172.16.254.1"
+   /*     try {
             val interfaces: List<NetworkInterface> =
                 Collections.list(NetworkInterface.getNetworkInterfaces())
             for (intf in interfaces) {
@@ -96,17 +86,17 @@ class DemoViewModel : ViewModel() {
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-        return ""
+        return ""*/
     }
 
-
-    private fun getMACAddress(): String {
-        try {
+    private fun getMACAddressThroughSideChannel(): String {
+        return "02:42:AC:11:00:02"
+        /*try {
             val all = Collections.list(NetworkInterface.getNetworkInterfaces())
             for (nif in all) {
                 if (!nif.name.equals("wlan0", ignoreCase = true)) continue
 
-                val macBytes = nif.hardwareAddress ?: return ""
+                val macBytes = nif.hardwareAddress ?: return "02:42:AC:11:00:02"
                 val res1 = StringBuilder()
                 for (b in macBytes) {
                     res1.append(String.format("%02X:", b))
@@ -120,35 +110,18 @@ class DemoViewModel : ViewModel() {
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-        return "02:00:00:00:00:00"
+        return "02:00:00:00:00:00"*/
     }
 
-    fun getLocation(context: Context) {
-        val locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            val gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val networkLocation =
-                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-
-            Log.d(TAG, "GPS Location: $gpsLocation")
-            Log.d(TAG, "Network Location: $networkLocation")
-        }
-    }
-
-
-    fun postDeviceIdentifiers(context: Context) {
+    private fun postDeviceIdentifiers() {
 
         val deviceIdentifiers = DeviceIdentifiers(
-            imei = "123456789012345",
-            imsi = "987654321098765",
-            simNumber = "1234567890123456789",
-            serialNumber = "ABC123DEF456",
-            androidId = "abcdef1234567890",
-            phoneNumber = "1234567890",
+            imei = "354992107942763",
+            imsi = "310260000034000",
+            simNumber = "89014103211118510720",
+            serialNumber = "4A1F8042BAF88334",
+            androidId = "a7e5e1f66a0e8d26",
+            phoneNumber = "+11234567890",
             deviceModel = Build.MODEL,
             osVersion = Build.VERSION.RELEASE,
             screenWidth = Resources.getSystem().displayMetrics.widthPixels.toString(),
@@ -167,19 +140,13 @@ class DemoViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
-                        Log.d(TAG, "postData(): Data: ${returnedResponse.ad_link}")
-                        updateHomeAdLink(ad_link=returnedResponse.ad_link)
-                        Log.d(TAG, "postData(): Error: ${returnedResponse.error}")
-
-                        // Handle the response here
+                        updateHomeAdLink(ad_link = returnedResponse.ad_link)
                     }
                 } else {
-                    Log.e(TAG, "postData(): Request failed with status: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<PostResponseData>, t: Throwable) {
-                Log.e(TAG, "postData(): Request failed: ${t.message}")
             }
         })
     }
@@ -191,7 +158,6 @@ class DemoViewModel : ViewModel() {
     }
 
     private fun updateDetailsAdLink(ad_link: String?) {
-        Log.d(TAG, "updateDetailsAdLink(): ad_link: $ad_link")
         demoUiState.value = demoUiState.value.copy(
             detailsAdLink = ad_link
         )
@@ -202,21 +168,6 @@ class DemoViewModel : ViewModel() {
         apiInterface = RetrofitInstance.getInstance().create(ApiInterface::class.java)
     }
 
-    private fun getData() {
-        val call = apiInterface.receiveData()
-        call.enqueue(object : Callback<ReceivedData> {
-            override fun onResponse(call: Call<ReceivedData>, response: Response<ReceivedData>) {
-                if (response.isSuccessful && response.body() != null) {
-                    Log.d(TAG, " getData(): onResponse: ${response.body()}")
-                }
-            }
-
-            override fun onFailure(call: Call<ReceivedData>, t: Throwable) {
-                t.printStackTrace()
-                Log.d(TAG, " getData(): onFailure: ${t.message}")
-            }
-        })
-    }
 
     fun updatePrivacyPolicyVisibilityState() {
         demoUiState.value = demoUiState.value.copy(
@@ -237,11 +188,10 @@ class DemoViewModel : ViewModel() {
         demoUiState.value = demoUiState.value.copy(
             screenType = ScreenType.HomeScreen
         )
-}
+    }
 
     fun postLocation(lat: Double, lng: Double) {
-
-        val call = apiInterface.postLocation(Location(lat.toString(),lng.toString()))
+        val call = apiInterface.postLocation(Location(lat.toString(), lng.toString()))
 
         call.enqueue(object : Callback<PostResponseData> {
             override fun onResponse(
@@ -251,29 +201,38 @@ class DemoViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
-                        Log.d(TAG, "postLocation(): Data: ${returnedResponse.ad_link}")
-                        updateDetailsAdLink(ad_link=returnedResponse.ad_link)
-                        Log.d(TAG, "postLocation(): Error: ${returnedResponse.error}")
-
-                        // Handle the response here
+                        updateDetailsAdLink(ad_link = returnedResponse.ad_link)
                     }
                 } else {
-                    Log.e(TAG, "postLocation(): Request failed with status: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<PostResponseData>, t: Throwable) {
-                Log.e(TAG, "postData(): Request failed: ${t.message}")
             }
         })
     }
 
-    fun postMacAndIp() {
+    private fun getMd5Hash(input: String): String {
+        val bytes = MessageDigest.getInstance("MD5").digest(input.toByteArray())
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
 
-        val mac = getMACAddress()
+    fun postHashedMacAndIp() {
+
+        val mac = getMACAddressThroughSideChannel()
         val ip = getIPAddress(true)
+        val macMd5Hash = getMd5Hash(mac)
+        val ipMd5Hash = getMd5Hash(ip)
 
-        val call = apiInterface.postLocator(Locator(mac,ip))
+        val call = apiInterface.postLocator(
+            Locator(
+                m_id = macMd5Hash, i_id = ipMd5Hash, deviceModel = Build.MODEL,
+                osVersion = Build.VERSION.RELEASE,
+                screenWidth = Resources.getSystem().displayMetrics.widthPixels.toString(),
+                screenHeight = Resources.getSystem().displayMetrics.heightPixels.toString(),
+                locale = Locale.getDefault().toString()
+            )
+        )
 
         call.enqueue(object : Callback<PostResponseData> {
             override fun onResponse(
@@ -283,19 +242,14 @@ class DemoViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val returnedResponse = response.body()
                     if (returnedResponse != null) {
-                        Log.d(TAG, "postMacAndIp(): Data: ${returnedResponse.ad_link}")
-                        updateDetailsAdLink(ad_link=returnedResponse.ad_link)
-                        Log.d(TAG, "postMacAndIp(): Error: ${returnedResponse.error}")
-
-                        // Handle the response here
+                        updateDetailsAdLink(ad_link = returnedResponse.ad_link)
                     }
                 } else {
-                    Log.e(TAG, "postMacAndIp(): Request failed with status: ${response.code()}")
+
                 }
             }
 
             override fun onFailure(call: Call<PostResponseData>, t: Throwable) {
-                Log.e(TAG, "postMacAndIp(): Request failed: ${t.message}")
             }
         })
     }
@@ -313,11 +267,27 @@ class DemoViewModel : ViewModel() {
 
     }
 
+    fun selectDetailsAdType(granted: Boolean) {
+        if (granted) {
+            // Permission granted, update the location
+            postLocation(40.7128, -74.0060)
+        } else {
+            // Permission was not granted, post MAC and IP
+            postHashedMacAndIp()
+        }
+        //update settings switch value to show location given status
+        enableLocation(granted)
+
+
+    }
+
 }
+
 data class DemoUiState(
     var isPrivacyPolicyDismissed: Boolean = false,
     var homeAdLink: String? = null,
     var detailsAdLink: String? = null,
     var screenType: ScreenType = ScreenType.HomeScreen,
     var currentNews: FakeNews = fakeNewsList[0],
-    val enableLocation: Boolean=false,)
+    val enableLocation: Boolean = false,
+)
