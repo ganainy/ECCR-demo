@@ -1,5 +1,6 @@
 import com.example.eccr_demo.data.AdvertisingIdentifiers
 import com.example.eccr_demo.data.Location
+import com.example.eccr_demo.data.MinimalIdentifiers
 import com.example.eccr_demo.data.PostResponseData
 import com.example.eccr_demo.data.ReceivedData
 import retrofit2.Call
@@ -15,7 +16,7 @@ interface ApiInterface {
     fun postAdvertisingIdentifiers(@Body deviceIdentifiers:  AdvertisingIdentifiers): Call<PostResponseData>
 
     @POST("randomAd")
-    fun postRandomAdRequest(@Body randomAdRequest: String): Call<PostResponseData>
+    fun postRandomAdRequest(@Body minimalIdentifiers: MinimalIdentifiers): Call<PostResponseData>
     @POST("localAd")
     fun postLocation(@Body location: Location): Call<PostResponseData>
 

@@ -33,6 +33,7 @@ import androidx.compose.runtime.MutableState
 import com.example.eccr_demo.data.AdvertisingIdentifiers
 import com.example.eccr_demo.data.FakeNews
 import com.example.eccr_demo.data.Location
+import com.example.eccr_demo.data.MinimalIdentifiers
 import com.example.eccr_demo.data.NetworkInfo
 import com.example.eccr_demo.data.PostResponseData
 import com.example.eccr_demo.data.ScreenType
@@ -87,7 +88,7 @@ class DemoViewModel : ViewModel() {
             screenWidth = 1080,
             screenHeight = 1920,
             deviceModel = "Pixel",
-            osVersion = "Android 11",
+            osVersion = "Android 10",
             networkInfo = networkInfo
         )
 
@@ -161,12 +162,21 @@ class DemoViewModel : ViewModel() {
 
 
 
-
+    val minimalIdentifiers = MinimalIdentifiers(
+        advertisingType = "Anonymous",
+        locale = "en_US",
+        screenWidth = 1080,
+        screenHeight = 1920,
+        deviceModel = "Pixel",
+        osVersion = "Android 10",
+    )
 
 
     fun postHomeRandomAdRequest() {
 
-        val call = apiInterface.postRandomAdRequest("Request for a random Ad")
+
+
+        val call = apiInterface.postRandomAdRequest(minimalIdentifiers)
 
         call.enqueue(object : Callback<PostResponseData> {
             override fun onResponse(
@@ -249,7 +259,7 @@ class DemoViewModel : ViewModel() {
     }
     fun postDetailsRandomAdRequest() {
 
-        val call = apiInterface.postRandomAdRequest("Request for a random Ad for details screen")
+        val call = apiInterface.postRandomAdRequest(minimalIdentifiers)
 
         call.enqueue(object : Callback<PostResponseData> {
             override fun onResponse(
