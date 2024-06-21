@@ -2,6 +2,8 @@
 
 This project was developed as part of the technical demo for the master's module "Emerging Challenges in Cyber Security."
 
+![Image Alt Text](https://github.com/ganainy/ECCR-demo/blob/main/Screenshot_1.png)
+
 ## Project Overview
 
 The repository contains two versions of an application:
